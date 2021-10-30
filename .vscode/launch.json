@@ -7,14 +7,14 @@
         {
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
-            "preLaunchTask": "build",
             "request": "launch",
+            "preLaunchTask": "build",
             "program": ".\\build\\Debug\\OpenGL.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true
+            "console": "integratedTerminal"
         }
     ]
 }
