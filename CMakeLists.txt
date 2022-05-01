@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(OpenGL VERSION 0.1.0)
 
-file(GLOB HEADERS "src/*.h")
-file(GLOB SRC "src/*.cpp")
+file(GLOB HEADERS "src/**/*.h")
+file(GLOB SRC "src/**/*.cpp")
 
 add_executable(OpenGL src/main.cpp ${SRC} ${HEADERS})
 

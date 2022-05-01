@@ -1,5 +1,5 @@
-#include "RenderInfo.h"
-#include "includes.h"
+#include "../headers/RenderInfo.h"
+#include "../headers/includes.h"
 
 void RenderInfo::ShowInfo()
 {

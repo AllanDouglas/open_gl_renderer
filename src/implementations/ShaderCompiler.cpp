@@ -1,5 +1,5 @@
-#include "Utils.h"
-#include "ShaderCompiler.h"
+#include "../headers/Utils.h"
+#include "../headers/ShaderCompiler.h"
 
 void ShaderCompiler::CheckShader(GLuint shaderId)
 {

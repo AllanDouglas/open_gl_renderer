@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cmake --build d:/Workspaces/c++/OpenGL/build --config Debug --target OpenGL -- /maxcpucount:6"
+            "command": "cmake --build build --config Debug --target OpenGL "
         }
     ]
 }

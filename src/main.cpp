@@ -1,11 +1,10 @@
 #include <array>
 #include <cassert>
-#include "includes.h"
-#include "RenderInfo.h"
-#include "FlyCamera.h"
-#include "ShaderCompiler.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "headers/includes.h"
+#include "headers/RenderInfo.h"
+#include "headers/FlyCamera.h"
+#include "headers/ShaderCompiler.h"
+#include "headers/TextureLoader.h"
 
 const int Width = 800;
 const int Height = 600;
@@ -19,39 +18,57 @@ struct Vertex
 
 GLuint LoadTexture(const char *textureFile)
 {
-	stbi_set_flip_vertically_on_load(true);
+	return TextureLoader::LoadTexture(textureFile);
+}
 
-	int textureWidth = 0;
-	int textureHeigth = 0;
-	int numberComponents = 0;
-	auto textureData = stbi_load(textureFile, &textureWidth, &textureHeigth, &numberComponents, 3);
+GLuint LoadGeometry()
+{
+	std::array<Vertex, 6> quad = {
+		Vertex{glm::vec3{-1, -1, 0}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec2(0.0f, 0.0f)}, // bot left
+		Vertex{glm::vec3{1, -1, 0}, glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec2(1.0f, 0.0f)},  // bot right
+		Vertex{glm::vec3{1, 1, 0}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec2(1.0f, 1.0f)},	  // top right
+		Vertex{glm::vec3{-1, 1, 0}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec2(0.0f, 1.0f)},  // top left
+	};
 
-	assert(textureData);
+	std::array<glm::ivec3, 2> indexes = {
+		glm::ivec3{0, 1, 2},
+		glm::ivec3{3, 2, 0},
+	};
 
-	// STARTING - load to video card
-	GLuint textureId;
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D, textureId);
+	GLuint vertexBuffer;
+	// create vertex buffer id
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad.data(), GL_STATIC_DRAW);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeigth, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+	GLuint elementBuffer;
 
-	// filters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_MIPMAP);
+	// create element buffer id
+	glGenBuffers(1, &elementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes.data(), GL_STATIC_DRAW);
 
-	// wraping
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// create VAO
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
 
-	// create mipmap
-	glGenerateMipmap(GL_TEXTURE_2D);
+	// select VAO
+	glBindVertexArray(vao);
 
-	// remove txture
-	glBindTexture(GL_TEXTURE_2D, 0);
+	// send buffers to GPU
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 
-	stbi_image_free(textureData);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
-	return textureId;
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);										   // position
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, Color))); // color
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, UV)));	   // UV
+
+	glBindVertexArray(0);
+	return vao;
 }
 
 ShaderCompiler shaderCompiler;
@@ -59,7 +76,6 @@ FlyCamera camera{Width, Height};
 
 int main()
 {
-
 	assert(glfwInit() == GLFW_TRUE);
 
 	GLFWwindow *Window = glfwCreateWindow(Width, Height, "OpenGL", nullptr, nullptr);
@@ -71,27 +87,11 @@ int main()
 
 	RenderInfo info;
 	info.ShowInfo();
-
+	glm::mat4 ModelMatrix = glm::identity<glm::mat4>();
 	auto shaderID = shaderCompiler.LoadShaders("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
 	auto textureID = LoadTexture("textures/earth_2k.jpg");
 
-	std::array<Vertex, 6> quad = {
-		Vertex{glm::vec3{-1, -1, 0}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec2(0.0f, 0.0f)}, // bot left
-		Vertex{glm::vec3{1, -1, 0}, glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec2(1.0f, 0.0f)},  // bot right
-		Vertex{glm::vec3{-1, 1, 0}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec2(0.0f, 1.0f)},  // top left
-
-		Vertex{glm::vec3{1, -1, 0}, glm::vec3{0.0f, 0.0f, 1.0f}, glm::vec2(1.0f, 0.0f)}, // bot right
-		Vertex{glm::vec3{1, 1, 0}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec2(1.0f, 1.0f)},	 // top right
-		Vertex{glm::vec3{-1, 1, 0}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec2(0.0f, 1.0f)}, // top left
-	};
-
-	glm::mat4 ModelMatrix = glm::identity<glm::mat4>();
-
-	GLuint vertexBuffer;
-
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad.data(), GL_STATIC_DRAW);
+	auto quadGemoetry = LoadGeometry();
 
 	glClearColor(0.3f, .3f, .3f, 1);
 
@@ -111,22 +111,17 @@ int main()
 		auto TextureLocation = glGetUniformLocation(shaderID, "TextureSampler");
 		glUniform1i(TextureLocation, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);										   // position
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, Color))); // color
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, UV)));	   // UV
+		glBindVertexArray(quadGemoetry);
 
-		glDrawArrays(GL_TRIANGLES, 0, quad.size());
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+		glBindVertexArray(0);
 
 		glUseProgram(0);
+		// prosses input queue event
 		glfwPollEvents();
+		// render frame butfer
 		glfwSwapBuffers(Window);
 	}
 

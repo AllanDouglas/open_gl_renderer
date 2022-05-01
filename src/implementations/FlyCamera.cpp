@@ -1,4 +1,4 @@
-#include "FlyCamera.h"
+#include "../headers/FlyCamera.h"
 
 FlyCamera::FlyCamera() {}
 
