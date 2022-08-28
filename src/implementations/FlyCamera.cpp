@@ -10,7 +10,7 @@ FlyCamera::FlyCamera(int Width, int Height)
 FlyCamera::FlyCamera(glm::vec3 location, glm::vec3 direction, glm::vec3 up,
 					 float fov, float aspectRatio, float near, float far) : FlyCamera(location, direction, up)
 {
-	Fov = fov;
+	Fov = glm::radians(fov);
 	AspectRatio = aspectRatio;
 	Near = near;
 	Far = far;

@@ -16,7 +16,7 @@ struct Vertex
 	glm::vec2 UV;
 };
 
-GLuint LoadTexture(const char *textureFile)
+GLuint LoadTexture(const char* textureFile)
 {
 	return TextureLoader::LoadTexture(textureFile);
 }
@@ -64,21 +64,21 @@ GLuint LoadGeometry()
 	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);										   // position
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, Color))); // color
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, UV)));	   // UV
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Color))); // color
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, UV)));	   // UV
 
 	glBindVertexArray(0);
 	return vao;
 }
 
-ShaderCompiler shaderCompiler;
-FlyCamera camera{Width, Height};
+
 
 int main()
 {
+
 	assert(glfwInit() == GLFW_TRUE);
 
-	GLFWwindow *Window = glfwCreateWindow(Width, Height, "OpenGL", nullptr, nullptr);
+	GLFWwindow* Window = glfwCreateWindow(Width, Height, "OpenGL", nullptr, nullptr);
 	assert(Window);
 
 	glfwMakeContextCurrent(Window);
@@ -87,6 +87,10 @@ int main()
 
 	RenderInfo info;
 	info.ShowInfo();
+
+	ShaderCompiler shaderCompiler;
+	FlyCamera camera{ glm::vec3(0.0f,0.0f,5.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f,1.0f,0.0f), 25.0f,Width / Height,1.0f,1000.0f };
+
 	glm::mat4 ModelMatrix = glm::identity<glm::mat4>();
 	auto shaderID = shaderCompiler.LoadShaders("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
 	auto textureID = LoadTexture("textures/earth_2k.jpg");

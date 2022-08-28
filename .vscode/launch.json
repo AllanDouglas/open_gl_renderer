@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": ".\\build\\Debug\\OpenGL.exe",
+            "program": ".\\build\\Debug\\Debug\\OpenGL.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

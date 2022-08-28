@@ -11,7 +11,7 @@ target_include_directories(OpenGL PRIVATE deps/glm
                                           deps/glfw/include
                                           deps/glew/include)
 
-target_link_directories(OpenGL PRIVATE deps/glfw/lib-mingw-w64
+target_link_directories(OpenGL PRIVATE deps/glfw/lib-vc2019
                                        deps/glew/lib/Release/x64)
 
 target_link_libraries(OpenGL PRIVATE glfw3.lib

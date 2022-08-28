@@ -1,2 +1,5 @@
 /[Bb]uild/
 /[Oo]ut/
+/.vscode/
+/.vs/
+/.vs/OpenGL/

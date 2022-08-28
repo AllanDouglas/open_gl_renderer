@@ -1,9 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\out",
-    "\\shaders"
+    "\\shaders",
+    "\\src"
   ],
-  "SelectedNode": "\\main.cpp",
+  "SelectedNode": "\\CMakeLists.txt",
   "PreviewInSolutionExplorer": false
 }
